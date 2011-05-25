@@ -6,6 +6,7 @@
             <th>Operation</th>
             <th>Collection</th>
             <th>Query</th>
+            <th>Ordering</th>
             <th>Skip</th>
             <th>Limit</th>
         </tr>
@@ -17,6 +18,7 @@
                 <td>{{ query.operation|title }}</td>
                 <td>{{ query.collection }}</td>
                 <td><code>{{ query.query|pprint }}</code></td>
+                <td>{% if query.ordering %}{{ query.ordering }}{% endif %}</td>
                 <td>{% if query.skip %}{{ query.skip }}{% endif %}</td>
                 <td>{% if query.limit %}{{ query.limit }}{% endif %}</td>
             </tr>
