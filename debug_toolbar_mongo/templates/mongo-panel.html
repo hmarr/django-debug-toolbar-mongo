@@ -3,18 +3,22 @@
     <thead>
         <tr>
             <th>Time (ms)</th>
-            <th>Type</th>
+            <th>Operation</th>
             <th>Collection</th>
             <th>Query</th>
+            <th>Skip</th>
+            <th>Limit</th>
         </tr>
     </thead>
     <tbody>
         {% for query in queries %}
             <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
                 <td>{{ query.time|floatformat:"4" }}</td>
-                <td>{{ query.type|title }}</td>
+                <td>{{ query.operation|title }}</td>
                 <td>{{ query.collection }}</td>
                 <td><code>{{ query.query|pprint }}</code></td>
+                <td>{% if query.skip %}{{ query.skip }}{% endif %}</td>
+                <td>{% if query.limit %}{{ query.limit }}{% endif %}</td>
             </tr>
         {% endfor %}
     </tbody>

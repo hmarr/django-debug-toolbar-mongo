@@ -9,7 +9,7 @@ import pymongo.cursor
 from debug_toolbar.panels import DebugPanel
 
 
-class MongoOperationHook(object):
+class MongoOperationTracker(object):
     """Track operations sent to MongoDB via PyMongo.
     """
 
@@ -36,26 +36,43 @@ class MongoOperationHook(object):
                 # Inactive or getMore - move on
                 return self.original_methods['refresh'](cursor_self)
 
-            query_details = {
-                'options': privar('query_options')(),
-                'collection_name': privar('collection').full_name,
-                'num_to_skip': privar('skip'),
-                'num_to_return': privar('limit'),
-                'query': privar('query_spec')(),
-                'field_selector': privar('fields'),
-            }
+            # NOTE: See pymongo/cursor.py+557 [_refresh()] and
+            # pymongo/message.py for where information is stored
 
             # Time the actual query
             start_time = time.time()
             result = self.original_methods['refresh'](cursor_self)
             total_time = (time.time() - start_time) * 1000
 
-            self.queries.append({
-                'type': 'query',
-                'query': query_details['query'].to_dict(),
-                'collection': query_details['collection_name'],
+            query_son = privar('query_spec')().to_dict()
+
+            query_data = {
                 'time': total_time,
-            })
+                'operation': 'query',
+            }
+
+            # Collection in format <db_name>.<collection_name>
+            collection_name = privar('collection')
+            query_data['collection'] = collection_name.full_name.split('.')[1]
+
+            if query_data['collection'] == '$cmd':
+                query_data['operation'] = 'command'
+                # Handle count as a special case
+                if 'count' in query_son:
+                    # Information is in a different format to a standar query
+                    query_data['collection'] = query_son['count']
+                    query_data['operation'] = 'count'
+                    query_data['skip'] = query_son.get('skip')
+                    query_data['limit'] = query_son.get('limit')
+                    query_data['query'] = query_son['query']
+                    del query_son['count']
+            else:
+                # Normal Query
+                query_data['skip'] = privar('skip')
+                query_data['limit'] = privar('limit')
+                query_data['query'] = query_son['$query']
+
+            self.queries.append(query_data)
 
             return result
 
@@ -82,22 +99,22 @@ class MongoDebugPanel(DebugPanel):
 
     def __init__(self, *args, **kwargs):
         super(self.__class__, self).__init__(*args, **kwargs)
-        self.op_hook = MongoOperationHook()
-        self.op_hook.install()
+        self.op_tracker = MongoOperationTracker()
+        self.op_tracker.install()
 
     def process_request(self, request):
-        self.op_hook.reset()
-        self.op_hook.start()
+        self.op_tracker.reset()
+        self.op_tracker.start()
 
     def process_response(self, request, response):
-        self.op_hook.stop()
+        self.op_tracker.stop()
 
     def nav_title(self):
         return 'MongoDB'
 
     def nav_subtitle(self):
-        num_queries = len(self.op_hook.queries)
-        return '{0} queries executed'.format(num_queries)
+        num_queries = len(self.op_tracker.queries)
+        return '{0} operations executed'.format(num_queries)
 
     def title(self):
         return 'MongoDB Queries'
@@ -107,7 +124,7 @@ class MongoDebugPanel(DebugPanel):
 
     def content(self):
         context = self.context.copy()
-        context['queries'] = self.op_hook.queries
+        context['queries'] = self.op_tracker.queries
         return render_to_string('mongo-panel.html', context)
 
 
