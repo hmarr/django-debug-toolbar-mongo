@@ -114,7 +114,8 @@ class MongoDebugPanel(DebugPanel):
 
     def nav_subtitle(self):
         num_queries = len(self.op_tracker.queries)
-        return '{0} operations executed'.format(num_queries)
+        total_time = sum(q['time'] for q in self.op_tracker.queries)
+        return '{0} operations in {1:.2f}ms'.format(num_queries, total_time)
 
     def title(self):
         return 'MongoDB Queries'
