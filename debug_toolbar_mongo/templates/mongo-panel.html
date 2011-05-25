@@ -1,0 +1,22 @@
+
+<table>
+    <thead>
+        <tr>
+            <th>Time (ms)</th>
+            <th>Type</th>
+            <th>Collection</th>
+            <th>Query</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for query in queries %}
+            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+                <td>{{ query.time|floatformat:"4" }}</td>
+                <td>{{ query.type|title }}</td>
+                <td>{{ query.collection }}</td>
+                <td><code>{{ query.query|pprint }}</code></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
