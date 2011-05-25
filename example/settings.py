@@ -45,4 +45,8 @@ DEBUG_TOOLBAR_PANELS = (
 
 ROOT_URLCONF = 'example.urls'
 
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+}
+
 INTERNAL_IPS = ('127.0.0.1',)

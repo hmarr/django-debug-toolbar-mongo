@@ -61,7 +61,6 @@ class MongoOperationTracker(object):
                     query_data['skip'] = query_son.get('skip')
                     query_data['limit'] = query_son.get('limit')
                     query_data['query'] = query_son['query']
-                    del query_son['count']
             else:
                 # Normal Query
                 query_data['skip'] = privar('skip')

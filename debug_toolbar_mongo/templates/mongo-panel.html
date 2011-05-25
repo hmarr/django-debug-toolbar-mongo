@@ -1,3 +1,11 @@
+{% load mongo_debug_tags %}
+
+<style type="text/css">
+pre.mongo-highlight, pre.mongo-highlight span {
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', 'Monaco', 'Courier New', monospace !important;
+    font-size: 1.05em !important;
+}
+</style>
 
 <table>
     <thead>
@@ -17,8 +25,12 @@
                 <td>{{ query.time|floatformat:"4" }}</td>
                 <td>{{ query.operation|title }}</td>
                 <td>{{ query.collection }}</td>
-                <td><code>{{ query.query|pprint }}</code></td>
-                <td>{% if query.ordering %}{{ query.ordering }}{% endif %}</td>
+                <td>
+                    {% if query.query %}
+                    <pre class="mongo-highlight">{{ query.query|format_dict|highlight_json|safe }}</pre>
+                  {% endif %}
+                </td>
+                <td><pre class="mongo-highlight">{% if query.ordering %}{{ query.ordering }}{% endif %}</pre></td>
                 <td>{% if query.skip %}{{ query.skip }}{% endif %}</td>
                 <td>{% if query.limit %}{{ query.limit }}{% endif %}</td>
             </tr>
