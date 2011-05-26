@@ -26,7 +26,8 @@ class MongoOperationTracker(object):
 
         # Wrap Cursor._refresh for getting queries
         @functools.wraps(self.original_methods['insert'])
-        def insert(collection_self, doc_or_docs, safe=False, **kwargs):
+        def insert(collection_self, doc_or_docs, manipulate=True,
+                   safe=False, check_keys=True, **kwargs):
             start_time = time.time()
             result = self.original_methods['insert'](
                 collection_self,
@@ -48,8 +49,8 @@ class MongoOperationTracker(object):
 
         # Wrap Cursor._refresh for getting queries
         @functools.wraps(self.original_methods['update'])
-        def update(collection_self, spec, document, upsert=False, safe=False,
-                   multi=False, **kwargs):
+        def update(collection_self, spec, document, upsert=False,
+                   maniuplate=False, safe=False, multi=False, **kwargs):
             start_time = time.time()
             result = self.original_methods['update'](
                 collection_self,
