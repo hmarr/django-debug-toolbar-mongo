@@ -11,6 +11,9 @@ class MongoOperationTracker(object):
 
     def __init__(self):
         self.queries = []
+        self.inserts = []
+        self.updates = []
+        self.removes = []
         self.active = False
 
     def install(self):
@@ -20,6 +23,79 @@ class MongoOperationTracker(object):
             'remove': pymongo.collection.Collection.remove,
             'refresh': pymongo.cursor.Cursor._refresh,
         }
+
+        # Wrap Cursor._refresh for getting queries
+        @functools.wraps(self.original_methods['insert'])
+        def insert(collection_self, doc_or_docs, safe=False, **kwargs):
+            start_time = time.time()
+            result = self.original_methods['insert'](
+                collection_self,
+                doc_or_docs,
+                safe=safe,
+                **kwargs
+            )
+            total_time = (time.time() - start_time) * 1000
+
+            if self.active:
+                self.inserts.append({
+                    'document': doc_or_docs,
+                    'safe': safe,
+                    'time': total_time,
+                })
+            return result
+
+        pymongo.collection.Collection.insert = insert
+
+        # Wrap Cursor._refresh for getting queries
+        @functools.wraps(self.original_methods['update'])
+        def update(collection_self, spec, document, upsert=False, safe=False,
+                   multi=False, **kwargs):
+            start_time = time.time()
+            result = self.original_methods['update'](
+                collection_self,
+                spec,
+                document,
+                upsert=False,
+                safe=False,
+                multi=False,
+                **kwargs
+            )
+            total_time = (time.time() - start_time) * 1000
+
+            if self.active:
+                self.updates.append({
+                    'document': document,
+                    'upsert': upsert,
+                    'multi': multi,
+                    'spec': spec,
+                    'safe': safe,
+                    'time': total_time,
+                })
+            return result
+
+        pymongo.collection.Collection.update = update
+
+        # Wrap Cursor._refresh for getting queries
+        @functools.wraps(self.original_methods['remove'])
+        def remove(collection_self, spec_or_id, safe=False, **kwargs):
+            start_time = time.time()
+            result = self.original_methods['insert'](
+                collection_self,
+                spec_or_id,
+                safe=safe,
+                **kwargs
+            )
+            total_time = (time.time() - start_time) * 1000
+
+            if self.active:
+                self.removes.append({
+                    'spec_or_id': spec_or_id,
+                    'safe': safe,
+                    'time': total_time,
+                })
+            return result
+
+        pymongo.collection.Collection.remove = remove
 
         # Wrap Cursor._refresh for getting queries
         @functools.wraps(self.original_methods['refresh'])
@@ -83,6 +159,8 @@ class MongoOperationTracker(object):
 
     def uninstall(self):
         pymongo.cursor.Cursor._refresh = self.original_methods['refresh']
+        pymongo.cursor.Collection.insert = self.original_methods['insert']
+        pymongo.cursor.Collection.update = self.original_methods['update']
 
     def reset(self):
         self.queries = []

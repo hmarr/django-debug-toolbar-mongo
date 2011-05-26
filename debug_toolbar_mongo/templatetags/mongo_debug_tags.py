@@ -6,7 +6,6 @@ register = template.Library()
 
 @register.filter
 def format_dict(value, width=60):
-    print width
     return pprint.pformat(value, width=int(width))
 
 @register.filter

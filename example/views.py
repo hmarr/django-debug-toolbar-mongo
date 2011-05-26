@@ -27,5 +27,9 @@ def index(request):
             }
         ]
     }))
+    db.test.insert({'name': 'test'})
+    db.test.insert({'name': 'test2'}, safe=True)
+    db.test.update({'name': 'test2'}, {'age': 1}, upsert=True)
+    db.test.remove({'name': 'test1'})
     return render_to_response('index.html')
 

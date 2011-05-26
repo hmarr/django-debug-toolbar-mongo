@@ -7,6 +7,8 @@ pre.mongo-highlight, pre.mongo-highlight span {
 }
 </style>
 
+<h4>Queries</h4>
+{% if queries %}
 <table>
     <thead>
         <tr>
@@ -37,4 +39,93 @@ pre.mongo-highlight, pre.mongo-highlight span {
         {% endfor %}
     </tbody>
 </table>
+{% else %}
+<p>No queries recorded</p>
+{% endif %}
+
+<h4>Inserts</h4>
+{% if inserts %}
+<table>
+    <thead>
+        <tr>
+            <th>Time (ms)</th>
+            <th>Document</th>
+            <th>Safe</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for insert in inserts %}
+            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+                <td>{{ insert.time|floatformat:"4" }}</td>
+                <td>
+                    <pre class="mongo-highlight">{{ insert.document|format_dict:120|highlight_json|safe }}</pre>
+                </td>
+                <td>{{ insert.safe }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No inserts recorded</p>
+{% endif %}
+
+<h4>Removes</h4>
+{% if removes %}
+<table>
+    <thead>
+        <tr>
+            <th>Time (ms)</th>
+            <th>Query / Id</th>
+            <th>Safe</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for remove in removes %}
+            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+                <td>{{ remove.time|floatformat:"4" }}</td>
+                <td>
+                    <pre class="mongo-highlight">{{ remove.spec_or_id|format_dict:120|highlight_json|safe }}</pre>
+                </td>
+                <td>{{ remove.safe }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No removes recorded</p>
+{% endif %}
+
+<h4>Updates</h4>
+{% if updates %}
+<table>
+    <thead>
+        <tr>
+            <th>Time (ms)</th>
+            <th>Query</th>
+            <th>Update</th>
+            <th>Safe</th>
+            <th>Multi</th>
+            <th>Upsert</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for update in updates %}
+            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+                <td>{{ update.time|floatformat:"4" }}</td>
+                <td>
+                    <pre class="mongo-highlight">{{ update.spec|format_dict:120|highlight_json|safe }}</pre>
+                </td>
+                <td>
+                    <pre class="mongo-highlight">{{ update.document|format_dict:120|highlight_json|safe }}</pre>
+                </td>
+                <td>{{ update.safe }}</td>
+                <td>{{ update.multi }}</td>
+                <td>{{ update.upsert }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No updates recorded</p>
+{% endif %}
 

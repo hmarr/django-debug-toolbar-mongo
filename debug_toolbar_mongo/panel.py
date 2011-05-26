@@ -28,7 +28,9 @@ class MongoDebugPanel(DebugPanel):
 
     def nav_subtitle(self):
         num_queries = len(self.op_tracker.queries)
-        total_time = sum(q['time'] for q in self.op_tracker.queries)
+        attrs = ['queries', 'inserts', 'updates', 'removes']
+        total_time = sum(sum(o['time'] for o in getattr(self.op_tracker, a))
+                         for a in attrs)
         return '{0} operations in {1:.2f}ms'.format(num_queries, total_time)
 
     def title(self):
@@ -40,6 +42,9 @@ class MongoDebugPanel(DebugPanel):
     def content(self):
         context = self.context.copy()
         context['queries'] = self.op_tracker.queries
+        context['inserts'] = self.op_tracker.inserts
+        context['updates'] = self.op_tracker.updates
+        context['removes'] = self.op_tracker.removes
         return render_to_string('mongo-panel.html', context)
 
 
