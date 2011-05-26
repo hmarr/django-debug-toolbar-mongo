@@ -6,7 +6,7 @@ from operation_tracker import MongoOperationTracker
 
 
 class MongoDebugPanel(DebugPanel):
-    """Panel that shows information about MongoDB queries.
+    """Panel that shows information about MongoDB operations.
     """
     name = 'MongoDB'
     has_content = True
@@ -34,7 +34,7 @@ class MongoDebugPanel(DebugPanel):
         return '{0} operations in {1:.2f}ms'.format(num_queries, total_time)
 
     def title(self):
-        return 'MongoDB Queries'
+        return 'MongoDB Operations'
 
     def url(self):
         return ''
