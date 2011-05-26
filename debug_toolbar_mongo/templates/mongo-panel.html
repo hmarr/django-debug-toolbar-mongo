@@ -5,11 +5,23 @@ pre.mongo-highlight, pre.mongo-highlight span {
     font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', 'Monaco', 'Courier New', monospace !important;
     font-size: 1.05em !important;
 }
+pre.mongo-stack-trace {
+    line-height: 2.3em !important;
+}
+table.mongo-stack-trace th {
+    text-align: left !important;
+}
+table.mongo-stack-trace td.code, table.mongo-stack-trace td.code span, table.mongo-stack-trace td.function {
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', 'Monaco', 'Courier New', monospace !important;
+}
+table.mongo-op-table tbody {
+    width: 100% !important;
+}
 </style>
 
 <h4>Queries</h4>
 {% if queries %}
-<table>
+<table class="mongo-op-table">
     <thead>
         <tr>
             <th>Time (ms)</th>
@@ -19,6 +31,7 @@ pre.mongo-highlight, pre.mongo-highlight span {
             <th>Ordering</th>
             <th>Skip</th>
             <th>Limit</th>
+            <th>Stack Trace</th>
         </tr>
     </thead>
     <tbody>
@@ -29,12 +42,38 @@ pre.mongo-highlight, pre.mongo-highlight span {
                 <td>{{ query.collection }}</td>
                 <td>
                     {% if query.query %}
-                    <pre class="mongo-highlight">{{ query.query|format_dict|highlight_json|safe }}</pre>
+                    <pre class="mongo-highlight">{{ query.query|format_dict|highlight:"javascript"|safe }}</pre>
                   {% endif %}
                 </td>
                 <td><pre class="mongo-highlight">{% if query.ordering %}{{ query.ordering }}{% endif %}</pre></td>
                 <td>{% if query.skip %}{{ query.skip }}{% endif %}</td>
                 <td>{% if query.limit %}{{ query.limit }}{% endif %}</td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="{{ forloop.counter }}">Toggle</a></td>
+            </tr>
+            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+                <td colspan="8">
+                    <table class="mongo-stack-trace "id="mongo-stack-trace-{{ forloop.counter }}">
+                        <thead>
+                            <tr>
+                                <th>Line</th>
+                                <th>File</th>
+                                <th>Function</th>
+                                <th>Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for line in query.stack_trace %}
+                            <tr>
+                                <td class="lineno">{{ line.1 }}</td>
+                                <td class="file">{{ line.0 }}</td>
+                                <td class="function">{{ line.2 }}</td>
+                                <td class="code">{{ line.3|highlight:"python"|safe }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <!--<pre class="mongo-stack-trace">{{ query.stack_trace|format_stack_trace }}</pre>-->
+                </td>
             </tr>
         {% endfor %}
     </tbody>
@@ -45,7 +84,7 @@ pre.mongo-highlight, pre.mongo-highlight span {
 
 <h4>Inserts</h4>
 {% if inserts %}
-<table>
+<table class="mongo-op-table">
     <thead>
         <tr>
             <th>Time (ms)</th>
@@ -58,7 +97,7 @@ pre.mongo-highlight, pre.mongo-highlight span {
             <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
                 <td>{{ insert.time|floatformat:"4" }}</td>
                 <td>
-                    <pre class="mongo-highlight">{{ insert.document|format_dict:120|highlight_json|safe }}</pre>
+                    <pre class="mongo-highlight">{{ insert.document|format_dict:120|highlight:"javascript"|safe }}</pre>
                 </td>
                 <td>{{ insert.safe }}</td>
             </tr>
@@ -71,7 +110,7 @@ pre.mongo-highlight, pre.mongo-highlight span {
 
 <h4>Removes</h4>
 {% if removes %}
-<table>
+<table class="mongo-op-table">
     <thead>
         <tr>
             <th>Time (ms)</th>
@@ -84,7 +123,7 @@ pre.mongo-highlight, pre.mongo-highlight span {
             <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
                 <td>{{ remove.time|floatformat:"4" }}</td>
                 <td>
-                    <pre class="mongo-highlight">{{ remove.spec_or_id|format_dict:120|highlight_json|safe }}</pre>
+                    <pre class="mongo-highlight">{{ remove.spec_or_id|format_dict:120|highlight:"javascript"|safe }}</pre>
                 </td>
                 <td>{{ remove.safe }}</td>
             </tr>
@@ -97,7 +136,7 @@ pre.mongo-highlight, pre.mongo-highlight span {
 
 <h4>Updates</h4>
 {% if updates %}
-<table>
+<table class="mongo-op-table">
     <thead>
         <tr>
             <th>Time (ms)</th>
@@ -113,10 +152,10 @@ pre.mongo-highlight, pre.mongo-highlight span {
             <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
                 <td>{{ update.time|floatformat:"4" }}</td>
                 <td>
-                    <pre class="mongo-highlight">{{ update.spec|format_dict:120|highlight_json|safe }}</pre>
+                    <pre class="mongo-highlight">{{ update.spec|format_dict:120|highlight:"javascript"|safe }}</pre>
                 </td>
                 <td>
-                    <pre class="mongo-highlight">{{ update.document|format_dict:120|highlight_json|safe }}</pre>
+                    <pre class="mongo-highlight">{{ update.document|format_dict:120|highlight:"javascript"|safe }}</pre>
                 </td>
                 <td>{{ update.safe }}</td>
                 <td>{{ update.multi }}</td>
@@ -129,3 +168,24 @@ pre.mongo-highlight, pre.mongo-highlight span {
 <p>No updates recorded</p>
 {% endif %}
 
+<script>
+(function() {
+    var toggleButtons = document.querySelectorAll('a.mongo-toggle-trace');
+    for (var i = 0; i < toggleButtons.length; i++) {
+        (function() {
+            var button = toggleButtons[i];
+            var index = button.dataset.row;
+            var trace = document.getElementById('mongo-stack-trace-' + index);
+            trace.style.display = "none";
+
+            button.addEventListener("click", function() {
+                if (trace.style.display == "none") {
+                    trace.style.display = "";
+                } else {
+                    trace.style.display = "none";
+                }
+            }, true);
+        })();
+    }
+})();
+</script>

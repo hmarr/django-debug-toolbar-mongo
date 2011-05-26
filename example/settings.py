@@ -37,10 +37,10 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.headers.HeaderDebugPanel',
     'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
     'debug_toolbar.panels.template.TemplateDebugPanel',
+    'debug_toolbar_mongo.panel.MongoDebugPanel',
     'debug_toolbar.panels.sql.SQLDebugPanel',
     'debug_toolbar.panels.signals.SignalDebugPanel',
     'debug_toolbar.panels.logger.LoggingPanel',
-    'debug_toolbar_mongo.panel.MongoDebugPanel',
 )
 
 ROOT_URLCONF = 'example.urls'
