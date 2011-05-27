@@ -115,6 +115,7 @@ def _cursor_refresh(cursor_self):
 
     query_son = privar('query_spec')()
 
+    __traceback_hide__ = True
     query_data = {
         'time': total_time,
         'operation': 'query',
