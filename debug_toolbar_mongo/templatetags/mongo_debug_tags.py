@@ -3,6 +3,7 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 import pprint
+import os
 
 register = template.Library()
 
@@ -18,6 +19,11 @@ def format_stack_trace(value):
         params = map(escape, frame[0].rsplit('/', 1) + list(frame[1:]))
         stack_trace.append(fmt.format(*params))
     return mark_safe('\n'.join(stack_trace))
+
+@register.filter
+def embolden_file(path):
+    head, tail = os.path.split(escape(path))
+    return mark_safe(os.sep.join([head, '<strong>{0}</strong>'.format(tail)]))
 
 @register.filter
 def format_dict(value, width=60):

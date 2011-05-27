@@ -48,11 +48,11 @@ table.mongo-op-table tbody {
                 <td><pre class="mongo-highlight">{% if query.ordering %}{{ query.ordering }}{% endif %}</pre></td>
                 <td>{% if query.skip %}{{ query.skip }}{% endif %}</td>
                 <td>{% if query.limit %}{{ query.limit }}{% endif %}</td>
-                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="{{ forloop.counter }}">Toggle</a></td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="queries-{{ forloop.counter }}">Toggle</a></td>
             </tr>
             <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
                 <td colspan="8">
-                    <table class="mongo-stack-trace "id="mongo-stack-trace-{{ forloop.counter }}">
+                    <table class="mongo-stack-trace "id="mongo-stack-trace-queries-{{ forloop.counter }}">
                         <thead>
                             <tr>
                                 <th>Line</th>
@@ -65,14 +65,13 @@ table.mongo-op-table tbody {
                         {% for line in query.stack_trace %}
                             <tr>
                                 <td class="lineno">{{ line.1 }}</td>
-                                <td class="file">{{ line.0 }}</td>
+                                <td class="file">{{ line.0|embolden_file }}</td>
                                 <td class="function">{{ line.2 }}</td>
                                 <td class="code">{{ line.3|highlight:"python"|safe }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
-                    <!--<pre class="mongo-stack-trace">{{ query.stack_trace|format_stack_trace }}</pre>-->
                 </td>
             </tr>
         {% endfor %}
@@ -90,6 +89,7 @@ table.mongo-op-table tbody {
             <th>Time (ms)</th>
             <th>Document</th>
             <th>Safe</th>
+            <th>Stack Trace</th>
         </tr>
     </thead>
     <tbody>
@@ -100,6 +100,31 @@ table.mongo-op-table tbody {
                     <pre class="mongo-highlight">{{ insert.document|format_dict:120|highlight:"javascript"|safe }}</pre>
                 </td>
                 <td>{{ insert.safe }}</td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="inserts-{{ forloop.counter }}">Toggle</a></td>
+            </tr>
+            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+                <td colspan="4">
+                    <table class="mongo-stack-trace "id="mongo-stack-trace-inserts-{{ forloop.counter }}">
+                        <thead>
+                            <tr>
+                                <th>Line</th>
+                                <th>File</th>
+                                <th>Function</th>
+                                <th>Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for line in insert.stack_trace %}
+                            <tr>
+                                <td class="lineno">{{ line.1 }}</td>
+                                <td class="file">{{ line.0|embolden_file }}</td>
+                                <td class="function">{{ line.2 }}</td>
+                                <td class="code">{{ line.3|highlight:"python"|safe }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
             </tr>
         {% endfor %}
     </tbody>

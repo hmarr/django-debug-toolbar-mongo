@@ -42,10 +42,12 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
     )
     total_time = (time.time() - start_time) * 1000
 
+    __traceback_hide__ = True
     inserts.append({
         'document': doc_or_docs,
         'safe': safe,
         'time': total_time,
+        'stack_trace': _tidy_stacktrace(reversed(inspect.stack())),
     })
     return result
 
@@ -65,6 +67,7 @@ def _update(collection_self, spec, document, upsert=False,
     )
     total_time = (time.time() - start_time) * 1000
 
+    __traceback_hide__ = True
     updates.append({
         'document': document,
         'upsert': upsert,
@@ -72,6 +75,7 @@ def _update(collection_self, spec, document, upsert=False,
         'spec': spec,
         'safe': safe,
         'time': total_time,
+        'stack_trace': _tidy_stacktrace(reversed(inspect.stack())),
     })
     return result
 
@@ -87,10 +91,12 @@ def _remove(collection_self, spec_or_id, safe=False, **kwargs):
     )
     total_time = (time.time() - start_time) * 1000
 
+    __traceback_hide__ = True
     removes.append({
         'spec_or_id': spec_or_id,
         'safe': safe,
         'time': total_time,
+        'stack_trace': _tidy_stacktrace(reversed(inspect.stack())),
     })
     return result
 
