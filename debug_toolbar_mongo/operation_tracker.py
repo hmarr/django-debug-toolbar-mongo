@@ -60,9 +60,9 @@ def _update(collection_self, spec, document, upsert=False,
         collection_self,
         spec,
         document,
-        upsert=False,
-        safe=False,
-        multi=False,
+        upsert=upsert,
+        safe=safe,
+        multi=multi,
         **kwargs
     )
     total_time = (time.time() - start_time) * 1000
