@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-debug-toolbar-mongo',
-    version='0.1',
+    version='0.1.1',
     description='MongoDB panel for the Django Debug Toolbar',
     long_description=open('README.rst').read(),
     author='Harry Marr',
@@ -10,6 +10,7 @@ setup(
     url='https://github.com/hmarr/django-debug-toolbar-mongo',
     license='MIT',
     packages=['debug_toolbar_mongo'],
+    package_data={ 'debug_toolbar_mongo': ['templates/*', 'templatetags/*'] },
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
