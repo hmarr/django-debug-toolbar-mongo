@@ -11,6 +11,7 @@ setup(
     license='MIT',
     packages=['debug_toolbar_mongo'],
     package_data={ 'debug_toolbar_mongo': ['templates/*', 'templatetags/*'] },
+    include_package_data=True,
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
