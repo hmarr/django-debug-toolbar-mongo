@@ -28,6 +28,13 @@ inserts = []
 updates = []
 removes = []
 
+WANT_STACK_TRACE = getattr(settings, 'DEBUG_TOOLBAR_MONGO_STACKTRACES', True)
+def _get_stacktrace():
+    if WANT_STACK_TRACE:
+        return _tidy_stacktrace(reversed(inspect.stack()))
+    else:
+        return []
+
 
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['insert'])
@@ -47,7 +54,7 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
         'document': doc_or_docs,
         'safe': safe,
         'time': total_time,
-        'stack_trace': _tidy_stacktrace(reversed(inspect.stack())),
+        'stack_trace': _get_stacktrace(),
     })
     return result
 
@@ -75,7 +82,7 @@ def _update(collection_self, spec, document, upsert=False,
         'spec': spec,
         'safe': safe,
         'time': total_time,
-        'stack_trace': _tidy_stacktrace(reversed(inspect.stack())),
+        'stack_trace': _get_stacktrace(),
     })
     return result
 
@@ -96,7 +103,7 @@ def _remove(collection_self, spec_or_id, safe=False, **kwargs):
         'spec_or_id': spec_or_id,
         'safe': safe,
         'time': total_time,
-        'stack_trace': _tidy_stacktrace(reversed(inspect.stack())),
+        'stack_trace': _get_stacktrace(),
     })
     return result
 
@@ -125,7 +132,7 @@ def _cursor_refresh(cursor_self):
     query_data = {
         'time': total_time,
         'operation': 'query',
-        'stack_trace': _tidy_stacktrace(reversed(inspect.stack())),
+        'stack_trace': _get_stacktrace(),
     }
 
     # Collection in format <db_name>.<collection_name>
