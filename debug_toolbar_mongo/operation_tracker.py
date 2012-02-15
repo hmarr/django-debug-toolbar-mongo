@@ -44,7 +44,9 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
     result = _original_methods['insert'](
         collection_self,
         doc_or_docs,
+        manipulate=manipulate,
         safe=safe,
+        check_keys=check_keys,
         **kwargs
     )
     total_time = (time.time() - start_time) * 1000
