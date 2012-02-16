@@ -36,7 +36,13 @@ def _get_stacktrace():
         except IndexError:
             # this is a work around because python's inspect.stack() sometimes fail
             # when jinja templates are on the stack
-            return []
+            return [(
+                "",
+                0,
+                "Error retrieving stack",
+                "Could not retrieve stack. IndexError exception occured in inspect.stack(). "
+                "This error might occur when jinja2 templates is on the stack.",
+            )]
         
         return _tidy_stacktrace(reversed(stack))
     else:
