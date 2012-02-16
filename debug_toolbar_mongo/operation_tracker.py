@@ -31,7 +31,14 @@ removes = []
 WANT_STACK_TRACE = getattr(settings, 'DEBUG_TOOLBAR_MONGO_STACKTRACES', True)
 def _get_stacktrace():
     if WANT_STACK_TRACE:
-        return _tidy_stacktrace(reversed(inspect.stack()))
+        try:
+            stack = inspect.stack()
+        except IndexError:
+            # this is a work around because python's inspect.stack() sometimes fail
+            # when jinja templates are on the stack
+            return []
+        
+        return _tidy_stacktrace(reversed(stack))
     else:
         return []
 
