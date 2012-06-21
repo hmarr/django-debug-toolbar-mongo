@@ -11,6 +11,7 @@ from django.conf import settings
 import pymongo
 import pymongo.collection
 import pymongo.cursor
+from bson.son import SON
 
 __all__ = ['queries', 'inserts', 'updates', 'removes', 'install_tracker',
            'uninstall_tracker', 'reset']
@@ -168,8 +169,12 @@ def _cursor_refresh(cursor_self):
         # Normal Query
         query_data['skip'] = privar('skip')
         query_data['limit'] = privar('limit')
-        query_data['query'] = query_son['$query']
-        query_data['ordering'] = _get_ordering(query_son)
+        if isinstance(query_son, SON):
+            query_data['query'] = query_son['$query']
+            query_data['ordering'] = _get_ordering(query_son)
+        else:
+            query_data['query'] = query_son
+            query_data['ordering'] = None
 
     queries.append(query_data)
 
