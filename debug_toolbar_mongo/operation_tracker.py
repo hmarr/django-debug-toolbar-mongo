@@ -43,7 +43,7 @@ def _get_stacktrace():
                 "Could not retrieve stack. IndexError exception occured in inspect.stack(). "
                 "This error might occur when jinja2 templates is on the stack.",
             )]
-        
+
         return _tidy_stacktrace(reversed(stack))
     else:
         return []
@@ -53,6 +53,7 @@ def _get_stacktrace():
 @functools.wraps(_original_methods['insert'])
 def _insert(collection_self, doc_or_docs, manipulate=True,
            safe=False, check_keys=True, **kwargs):
+    pass
     start_time = time.time()
     result = _original_methods['insert'](
         collection_self,
@@ -77,6 +78,7 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
 @functools.wraps(_original_methods['update'])
 def _update(collection_self, spec, document, upsert=False,
            maniuplate=False, safe=False, multi=False, **kwargs):
+    pass
     start_time = time.time()
     result = _original_methods['update'](
         collection_self,
@@ -168,7 +170,7 @@ def _cursor_refresh(cursor_self):
         # Normal Query
         query_data['skip'] = privar('skip')
         query_data['limit'] = privar('limit')
-        query_data['query'] = query_son['$query']
+        query_data['query'] = query_son
         query_data['ordering'] = _get_ordering(query_son)
 
     queries.append(query_data)
