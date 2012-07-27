@@ -43,7 +43,7 @@ def _get_stacktrace():
                 "Could not retrieve stack. IndexError exception occured in inspect.stack(). "
                 "This error might occur when jinja2 templates is on the stack.",
             )]
-        
+
         return _tidy_stacktrace(reversed(stack))
     else:
         return []
@@ -168,7 +168,7 @@ def _cursor_refresh(cursor_self):
         # Normal Query
         query_data['skip'] = privar('skip')
         query_data['limit'] = privar('limit')
-        query_data['query'] = query_son['$query']
+        query_data['query'] = query_son.get('$query')
         query_data['ordering'] = _get_ordering(query_son)
 
     queries.append(query_data)
