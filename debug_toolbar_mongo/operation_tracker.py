@@ -163,6 +163,12 @@ def _cursor_refresh(cursor_self):
             query_data['skip'] = query_son.get('skip')
             query_data['limit'] = query_son.get('limit')
             query_data['query'] = query_son['query']
+        elif 'aggregate' in query_son:
+            query_data['collection'] = query_son['aggregate']
+            query_data['operation'] = 'aggregate'
+            query_data['query'] = query_son['pipeline']
+            query_data['skip'] = 0
+            query_data['limit'] = None
     else:
         # Normal Query
         query_data['skip'] = privar('skip')
