@@ -4,9 +4,6 @@ import inspect
 import os
 import SocketServer
 
-import django
-from django.conf import settings
-
 import pymongo
 import pymongo.collection
 import pymongo.cursor
@@ -27,7 +24,7 @@ inserts = []
 updates = []
 removes = []
 
-WANT_STACK_TRACE = getattr(settings, 'DEBUG_TOOLBAR_MONGO_STACKTRACES', True)
+WANT_STACK_TRACE = True #getattr(settings, 'DEBUG_TOOLBAR_MONGO_STACKTRACES', True)
 def _get_stacktrace():
     if WANT_STACK_TRACE:
         try:
@@ -226,8 +223,6 @@ def _tidy_stacktrace(stack):
 
     ``stack`` should be a list of frame tuples from ``inspect.stack()``
     """
-    django_path = os.path.realpath(os.path.dirname(django.__file__))
-    django_path = os.path.normpath(os.path.join(django_path, '..'))
     socketserver_path = os.path.realpath(os.path.dirname(SocketServer.__file__))
     pymongo_path = os.path.realpath(os.path.dirname(pymongo.__file__))
 
@@ -237,9 +232,6 @@ def _tidy_stacktrace(stack):
         # Support hiding of frames -- used in various utilities that provide
         # inspection.
         if '__traceback_hide__' in frame.f_locals:
-            continue
-        if getattr(settings, 'DEBUG_TOOLBAR_CONFIG', {}).get('HIDE_DJANGO_SQL', True) \
-            and django_path in s_path and not 'django/contrib' in s_path:
             continue
         if socketserver_path in s_path:
             continue

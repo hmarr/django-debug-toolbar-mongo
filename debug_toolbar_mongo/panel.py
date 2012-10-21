@@ -1,6 +1,6 @@
 from django.template.loader import render_to_string
 
-from debug_toolbar.panels import DebugPanel
+from flask_debugtoolbar.panels import DebugPanel
 
 import operation_tracker
 
