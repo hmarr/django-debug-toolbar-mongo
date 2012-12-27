@@ -12,7 +12,7 @@ class MongoDebugPanel(DebugPanel):
     has_content = True
 
     def __init__(self, *args, **kwargs):
-        super(self.__class__, self).__init__(*args, **kwargs)
+        super(MongoDebugPanel, self).__init__(*args, **kwargs)
         operation_tracker.install_tracker()
 
     def process_request(self, request):
