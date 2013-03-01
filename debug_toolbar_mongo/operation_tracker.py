@@ -145,7 +145,7 @@ def _cursor_refresh(cursor_self):
     __traceback_hide__ = True
     query_data = {
         'time': total_time,
-        'operation': 'query',
+        'operation': 'find',
         'stack_trace': _get_stacktrace(),
     }
 
@@ -161,7 +161,7 @@ def _cursor_refresh(cursor_self):
             query_data['collection'] = query_son['count']
             query_data['operation'] = 'count'
             query_data['skip'] = query_son.get('skip')
-            query_data['limit'] = query_son.get('limit')
+            query_data['limit'] = abs(query_son.get('limit', 0))
             query_data['query'] = query_son['query']
         elif 'aggregate' in query_son:
             query_data['collection'] = query_son['aggregate']
@@ -172,7 +172,7 @@ def _cursor_refresh(cursor_self):
     else:
         # Normal Query
         query_data['skip'] = privar('skip')
-        query_data['limit'] = privar('limit')
+        query_data['limit'] = abs(privar('limit') or 0)
         query_data['query'] = query_son.get('$query') or query_son
         query_data['ordering'] = _get_ordering(query_son)
 
