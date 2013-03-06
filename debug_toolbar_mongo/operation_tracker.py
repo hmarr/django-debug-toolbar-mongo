@@ -135,6 +135,14 @@ def _cursor_refresh(cursor_self):
         # getMore not query - move on
         return _original_methods['refresh'](cursor_self)
 
+    if privar('explain'):
+        # avoid loggin explain cursors, problably used for extra debugging
+        return _original_methods['refresh'](cursor_self)
+
+    if privar('collection').name == '$cmd':
+        if 'explain' in privar('query_spec')():
+            return _original_methods['refresh'](cursor_self)
+
     # NOTE: See pymongo/cursor.py+557 [_refresh()] and
     # pymongo/message.py for where information is stored
 
