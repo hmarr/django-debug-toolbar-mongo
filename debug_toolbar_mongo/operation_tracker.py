@@ -65,6 +65,7 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
 
     __traceback_hide__ = True
     inserts.append({
+        'collection': collection_self.name,
         'document': doc_or_docs,
         'safe': safe,
         'time': total_time,
@@ -90,6 +91,7 @@ def _update(collection_self, spec, document, upsert=False,
 
     __traceback_hide__ = True
     updates.append({
+        'collection': collection_self.name,
         'document': document,
         'upsert': upsert,
         'multi': multi,
@@ -114,6 +116,7 @@ def _remove(collection_self, spec_or_id, safe=False, **kwargs):
 
     __traceback_hide__ = True
     removes.append({
+        'collection': collection_self.name,
         'spec_or_id': spec_or_id,
         'safe': safe,
         'time': total_time,
