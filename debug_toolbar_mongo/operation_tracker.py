@@ -154,6 +154,9 @@ def _cursor_refresh(cursor_self):
     query_data['collection'] = collection_name.full_name.split('.')[1]
 
     if query_data['collection'] == '$cmd':
+        # The query can be embedded within $query in some cases
+        query_son = query_son.get("$query", query_son)
+
         query_data['operation'] = 'command'
         # Handle count as a special case
         if 'count' in query_son:
