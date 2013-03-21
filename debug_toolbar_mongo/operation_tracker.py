@@ -14,6 +14,11 @@ import pymongo.cursor
 __all__ = ['queries', 'inserts', 'updates', 'removes', 'install_tracker',
            'uninstall_tracker', 'reset']
 
+if pymongo.version_tuple < (2, 4):
+    _SAFE_ARG = False
+
+else:
+    _SAFE_ARG = None
 
 _original_methods = {
     'insert': pymongo.collection.Collection.insert,
@@ -51,7 +56,7 @@ def _get_stacktrace():
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['insert'])
 def _insert(collection_self, doc_or_docs, manipulate=True,
-           safe=None, check_keys=True, **kwargs):
+           safe=_SAFE_ARG, check_keys=True, **kwargs):
     start_time = time.time()
     result = _original_methods['insert'](
         collection_self,
@@ -76,7 +81,7 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['update'])
 def _update(collection_self, spec, document, upsert=False,
-           maniuplate=False, safe=None, multi=False, **kwargs):
+           maniuplate=False, safe=_SAFE_ARG, multi=False, **kwargs):
     start_time = time.time()
     result = _original_methods['update'](
         collection_self,
@@ -104,7 +109,7 @@ def _update(collection_self, spec, document, upsert=False,
 
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['remove'])
-def _remove(collection_self, spec_or_id, safe=None, **kwargs):
+def _remove(collection_self, spec_or_id, safe=_SAFE_ARG, **kwargs):
     start_time = time.time()
     result = _original_methods['remove'](
         collection_self,
