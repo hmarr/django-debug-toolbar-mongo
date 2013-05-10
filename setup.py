@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-debug-toolbar-mongo',
-    version=":versiontools:debug_toolbar_mongo:",
+    version="0.1.5pre",
     description='MongoDB panel for the Django Debug Toolbar',
     long_description=open('README.rst').read(),
     author='Harry Marr',
@@ -22,6 +22,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
         'Topic :: Database',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],

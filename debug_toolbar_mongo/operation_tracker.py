@@ -2,7 +2,13 @@ import functools
 import time
 import inspect
 import os
-import SocketServer
+
+try:
+    import socketserver
+
+# Python 2 fallback.
+except:
+    import SocketServer as socketserver
 
 import django
 from django.conf import settings
@@ -14,6 +20,11 @@ import pymongo.cursor
 __all__ = ['queries', 'inserts', 'updates', 'removes', 'install_tracker',
            'uninstall_tracker', 'reset']
 
+if pymongo.version_tuple < (2, 4):
+    _SAFE_ARG = False
+
+else:
+    _SAFE_ARG = None
 
 _original_methods = {
     'insert': pymongo.collection.Collection.insert,
@@ -51,7 +62,7 @@ def _get_stacktrace():
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['insert'])
 def _insert(collection_self, doc_or_docs, manipulate=True,
-           safe=False, check_keys=True, **kwargs):
+           safe=_SAFE_ARG, check_keys=True, **kwargs):
     start_time = time.time()
     result = _original_methods['insert'](
         collection_self,
@@ -65,6 +76,7 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
 
     __traceback_hide__ = True
     inserts.append({
+        'collection': collection_self.name,
         'document': doc_or_docs,
         'safe': safe,
         'time': total_time,
@@ -75,7 +87,7 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['update'])
 def _update(collection_self, spec, document, upsert=False,
-           maniuplate=False, safe=False, multi=False, **kwargs):
+           maniuplate=False, safe=_SAFE_ARG, multi=False, **kwargs):
     start_time = time.time()
     result = _original_methods['update'](
         collection_self,
@@ -90,6 +102,7 @@ def _update(collection_self, spec, document, upsert=False,
 
     __traceback_hide__ = True
     updates.append({
+        'collection': collection_self.name,
         'document': document,
         'upsert': upsert,
         'multi': multi,
@@ -102,7 +115,7 @@ def _update(collection_self, spec, document, upsert=False,
 
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['remove'])
-def _remove(collection_self, spec_or_id, safe=False, **kwargs):
+def _remove(collection_self, spec_or_id, safe=_SAFE_ARG, **kwargs):
     start_time = time.time()
     result = _original_methods['remove'](
         collection_self,
@@ -114,6 +127,7 @@ def _remove(collection_self, spec_or_id, safe=False, **kwargs):
 
     __traceback_hide__ = True
     removes.append({
+        'collection': collection_self.name,
         'spec_or_id': spec_or_id,
         'safe': safe,
         'time': total_time,
@@ -131,6 +145,14 @@ def _cursor_refresh(cursor_self):
     if privar('id') is not None:
         # getMore not query - move on
         return _original_methods['refresh'](cursor_self)
+
+    if privar('explain'):
+        # avoid loggin explain cursors, problably used for extra debugging
+        return _original_methods['refresh'](cursor_self)
+
+    if privar('collection').name == '$cmd':
+        if 'explain' in privar('query_spec')():
+            return _original_methods['refresh'](cursor_self)
 
     # NOTE: See pymongo/cursor.py+557 [_refresh()] and
     # pymongo/message.py for where information is stored
@@ -217,7 +239,7 @@ def _get_ordering(son):
         return '{0}{1}'.format({-1: '-', 1: '+'}[direction], field)
 
     if '$orderby' in son:
-        return ', '.join(fmt(f, d) for f, d in son['$orderby'].items())
+        return ', '.join(fmt(f, d) for f, d in list(son['$orderby'].items()))
 
 # Taken from Django Debug Toolbar 0.8.6
 def _tidy_stacktrace(stack):
@@ -231,7 +253,7 @@ def _tidy_stacktrace(stack):
     """
     django_path = os.path.realpath(os.path.dirname(django.__file__))
     django_path = os.path.normpath(os.path.join(django_path, '..'))
-    socketserver_path = os.path.realpath(os.path.dirname(SocketServer.__file__))
+    socketserver_path = os.path.realpath(os.path.dirname(socketserver.__file__))
     pymongo_path = os.path.realpath(os.path.dirname(pymongo.__file__))
 
     trace = []

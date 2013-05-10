@@ -90,7 +90,7 @@ table.mongo-op-table tbody {
     </tbody>
 </table>
 {% else %}
-<p>No queries recorded</p>
+<p>No reads recorded</p>
 {% endif %}
 
 <h4>Inserts</h4>
@@ -99,6 +99,7 @@ table.mongo-op-table tbody {
     <thead>
         <tr>
             <th>Time (ms)</th>
+            <th>Collection</th>
             <th style="width: 100%">Document</th>
             <th>Safe</th>
             <th>Stack Trace</th>
@@ -108,6 +109,7 @@ table.mongo-op-table tbody {
         {% for insert in inserts %}
             <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
                 <td>{{ insert.time|floatformat:"4" }}</td>
+                <td>{{ insert.collection }}</td>
                 <td>
                     <pre class="mongo-highlight">{{ insert.document|format_dict:120|highlight:"javascript"|safe }}</pre>
                 </td>
@@ -151,6 +153,7 @@ table.mongo-op-table tbody {
     <thead>
         <tr>
             <th>Time (ms)</th>
+            <th>Collection</th>
             <th>Query</th>
             <th style="width: 100%">Update</th>
             <th>Safe</th>
@@ -163,6 +166,7 @@ table.mongo-op-table tbody {
         {% for update in updates %}
             <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
                 <td>{{ update.time|floatformat:"4" }}</td>
+                <td>{{ update.collection }}</td>
                 <td>
                     <pre class="mongo-highlight">{{ update.spec|format_dict:120|highlight:"javascript"|safe }}</pre>
                 </td>
@@ -211,6 +215,7 @@ table.mongo-op-table tbody {
     <thead>
         <tr>
             <th>Time (ms)</th>
+            <th>Collection</th>
             <th style="width: 100%">Query / Id</th>
             <th>Safe</th>
             <th>Stack Trace</th>
@@ -220,6 +225,7 @@ table.mongo-op-table tbody {
         {% for remove in removes %}
             <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
                 <td>{{ remove.time|floatformat:"4" }}</td>
+                <td>{{ remove.collection }}</td>
                 <td>
                     <pre class="mongo-highlight">{{ remove.spec_or_id|format_dict:120|highlight:"javascript"|safe }}</pre>
                 </td>

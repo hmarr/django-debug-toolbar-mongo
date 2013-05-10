@@ -4,9 +4,9 @@ from django.utils.safestring import mark_safe
 
 from debug_toolbar.panels import DebugPanel
 
-import operation_tracker
+from . import operation_tracker
 
-_NAV_SUBTITLE_TPL = u'''
+_NAV_SUBTITLE_TPL = '''
 {% for o, n, t in operations %}
     {{ n }} {{ o }}{{ n|pluralize }} in {{ t }}ms<br/>
 
