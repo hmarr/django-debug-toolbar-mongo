@@ -38,6 +38,7 @@ table.mongo-op-table tbody {
         <tr>
             <th>Time (ms)</th>
             <th>Operation</th>
+            <th>Cursor</th>
             <th>Collection</th>
             <th style="width: 100%">Query</th>
             <th>Ordering</th>
@@ -51,6 +52,7 @@ table.mongo-op-table tbody {
             <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
                 <td>{{ query.time|floatformat:"4" }}</td>
                 <td>{{ query.operation|title }}</td>
+                <td>{{ query.cursor }}</td>
                 <td>{{ query.collection }}</td>
                 <td>
                     {% if query.query %}

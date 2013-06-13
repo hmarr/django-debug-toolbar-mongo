@@ -128,13 +128,10 @@ def _cursor_refresh(cursor_self):
     def privar(name):
         return getattr(cursor_self, '_Cursor__{0}'.format(name))
 
-    if privar('id') is not None:
-        # getMore not query - move on
-        return _original_methods['refresh'](cursor_self)
-
     # NOTE: See pymongo/cursor.py+557 [_refresh()] and
     # pymongo/message.py for where information is stored
 
+    is_getmore = privar('id') is not None
     # Time the actual query
     start_time = time.time()
     result = _original_methods['refresh'](cursor_self)
@@ -148,6 +145,13 @@ def _cursor_refresh(cursor_self):
         'operation': 'find',
         'stack_trace': _get_stacktrace(),
     }
+
+    if is_getmore:
+        # getMore not query - move on
+        query_data['cursor'] = id(cursor_self)
+        query_data['operation'] = 'getmore'
+        queries.append(query_data)
+        return result
 
     # Collection in format <db_name>.<collection_name>
     collection_name = privar('collection')
@@ -178,6 +182,7 @@ def _cursor_refresh(cursor_self):
         query_data['limit'] = abs(privar('limit') or 0)
         query_data['query'] = query_son.get('$query') or query_son
         query_data['ordering'] = _get_ordering(query_son)
+        query_data['cursor'] = id(cursor_self)
 
     queries.append(query_data)
 
