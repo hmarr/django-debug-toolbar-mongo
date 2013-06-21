@@ -17,8 +17,7 @@ import pymongo
 import pymongo.collection
 import pymongo.cursor
 
-__all__ = ['queries', 'inserts', 'updates', 'removes', 'install_tracker',
-           'uninstall_tracker', 'reset']
+__all__ = ['queries', 'inserts', 'updates', 'removes', 'reset']
 
 if pymongo.version_tuple < (2, 4):
     _SAFE_ARG = False
@@ -59,7 +58,7 @@ def _get_stacktrace():
         return []
 
 
-# Wrap Cursor._refresh for getting queries
+# Wrap Collection.insert for getting inserts
 @functools.wraps(_original_methods['insert'])
 def _insert(collection_self, doc_or_docs, manipulate=True,
            safe=_SAFE_ARG, check_keys=True, **kwargs):
@@ -83,8 +82,9 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
         'stack_trace': _get_stacktrace(),
     })
     return result
+pymongo.collection.Collection.insert = _insert
 
-# Wrap Cursor._refresh for getting queries
+# Wrap Collection.update for getting updates
 @functools.wraps(_original_methods['update'])
 def _update(collection_self, spec, document, upsert=False,
            maniuplate=False, safe=_SAFE_ARG, multi=False, **kwargs):
@@ -112,8 +112,9 @@ def _update(collection_self, spec, document, upsert=False,
         'stack_trace': _get_stacktrace(),
     })
     return result
+pymongo.collection.Collection.update = _update
 
-# Wrap Cursor._refresh for getting queries
+# Wrap Collection.remove for getting removes
 @functools.wraps(_original_methods['remove'])
 def _remove(collection_self, spec_or_id, safe=_SAFE_ARG, **kwargs):
     start_time = time.time()
@@ -134,6 +135,7 @@ def _remove(collection_self, spec_or_id, safe=_SAFE_ARG, **kwargs):
         'stack_trace': _get_stacktrace(),
     })
     return result
+pymongo.collection.Collection.remove = _remove
 
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['refresh'])
@@ -201,26 +203,7 @@ def _cursor_refresh(cursor_self):
     queries.append(query_data)
 
     return result
-
-def install_tracker():
-    if pymongo.collection.Collection.insert != _insert:
-        pymongo.collection.Collection.insert = _insert
-    if pymongo.collection.Collection.update != _update:
-        pymongo.collection.Collection.update = _update
-    if pymongo.collection.Collection.remove != _remove:
-        pymongo.collection.Collection.remove = _remove
-    if pymongo.cursor.Cursor._refresh != _cursor_refresh:
-        pymongo.cursor.Cursor._refresh = _cursor_refresh
-
-def uninstall_tracker():
-    if pymongo.collection.Collection.insert == _insert:
-        pymongo.collection.Collection.insert = _original_methods['insert']
-    if pymongo.collection.Collection.update == _update:
-        pymongo.collection.Collection.update = _original_methods['update']
-    if pymongo.collection.Collection.remove == _remove:
-        pymongo.collection.Collection.remove = _original_methods['remove']
-    if pymongo.cursor.Cursor._refresh == _cursor_refresh:
-        pymongo.cursor.Cursor._refresh = _original_methods['cursor_refresh']
+pymongo.cursor.Cursor._refresh = _cursor_refresh
 
 def reset():
     global queries, inserts, updates, removes

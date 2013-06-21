@@ -24,7 +24,6 @@ class MongoDebugPanel(DebugPanel):
 
     def __init__(self, *args, **kwargs):
         super(self.__class__, self).__init__(*args, **kwargs)
-        operation_tracker.install_tracker()
 
     def process_request(self, request):
         operation_tracker.reset()
