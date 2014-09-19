@@ -28,6 +28,8 @@ updates = []
 removes = []
 
 WANT_STACK_TRACE = getattr(settings, 'DEBUG_TOOLBAR_MONGO_STACKTRACES', True)
+
+
 def _get_stacktrace():
     if WANT_STACK_TRACE:
         try:
