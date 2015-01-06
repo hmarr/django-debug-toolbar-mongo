@@ -7,6 +7,11 @@ Django Debug Toolbar MongoDB Panel
 
 Setup
 =====
+
+Install package::
+
+    pip install django-debug-toolbar-mongo
+
 Add the following lines to your ``settings.py``::
 
    INSTALLED_APPS = (
