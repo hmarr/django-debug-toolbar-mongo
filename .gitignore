@@ -2,3 +2,4 @@
 .tox
 *.egg-info
 *.egg
+.DS_Store

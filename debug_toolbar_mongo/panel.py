@@ -21,6 +21,7 @@ class MongoDebugPanel(DebugPanel):
     """
     name = 'MongoDB'
     has_content = True
+    template = 'mongo-panel.html'
 
     def __init__(self, *args, **kwargs):
         super(self.__class__, self).__init__(*args, **kwargs)
@@ -65,12 +66,11 @@ class MongoDebugPanel(DebugPanel):
     def url(self):
         return ''
 
-    def content(self):
-        context = self.context.copy()
-        context['queries'] = operation_tracker.queries
-        context['inserts'] = operation_tracker.inserts
-        context['updates'] = operation_tracker.updates
-        context['removes'] = operation_tracker.removes
-        return render_to_string('mongo-panel.html', context)
-
+    def process_response(self, request, response):
+        self.record_stats({
+            'queries': operation_tracker.queries,
+            'inserts': operation_tracker.inserts,
+            'updates': operation_tracker.updates,
+            'removes': operation_tracker.removes
+        })
 
