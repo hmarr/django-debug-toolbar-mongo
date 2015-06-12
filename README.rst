@@ -9,6 +9,7 @@ Setup
 =====
 Add the following lines to your ``settings.py``::
 
+```
    INSTALLED_APPS = (
        ...
        'debug_toolbar_mongo',
@@ -20,6 +21,7 @@ Add the following lines to your ``settings.py``::
        'debug_toolbar_mongo.panel.MongoDebugPanel',
        ...
    )
+```
 
 An extra panel titled "MongoDB" should appear in your debug toolbar.
 
@@ -28,7 +30,9 @@ Note that this should work with any Django application that uses PyMongo.
 Obtaining stack traces can slow down queries significantly. To turn them off
 add the following lines to your ``settings.py``::
 
+```
     DEBUG_TOOLBAR_MONGO_STACKTRACES = False
+```
 
 Disclaimer: only tested in latest Chrome, may fall to pieces in other browers.
 If you feel like fixing it, contributions are welcome!
