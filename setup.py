@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='django-debug-toolbar-mongo',
-    version=":versiontools:debug_toolbar_mongo:",
-    description='MongoDB panel for the Django Debug Toolbar',
+    name='flask-debug-toolbar-mongo',
+    version=":versiontools:flask_debug_toolbar_mongo:",
+    description='MongoDB panel for the Flask Debug Toolbar',
     long_description=open('README.rst').read(),
     author='Harry Marr',
     author_email='harry@hmarr.com',
@@ -17,7 +17,7 @@ setup(
     ],
     classifiers=[
         'Environment :: Web Environment',
-        'Framework :: Django',
+        'Framework :: Flask',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
