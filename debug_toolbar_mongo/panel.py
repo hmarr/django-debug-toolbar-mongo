@@ -1,6 +1,6 @@
-from flask import render_template
 from flask_debugtoolbar.panels import DebugPanel
-
+import jinja2
+import os
 from . import operation_tracker
 
 
@@ -12,6 +12,8 @@ class MongoDebugPanel(DebugPanel):
 
     def __init__(self, *args, **kwargs):
         super(self.__class__, self).__init__(*args, **kwargs)
+        module_path = os.path.join(os.path.dirname(__file__), 'templates')
+        self.jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(module_path))
         operation_tracker.install_tracker()
 
     def process_request(self, request):
@@ -39,6 +41,4 @@ class MongoDebugPanel(DebugPanel):
         context['inserts'] = operation_tracker.inserts
         context['updates'] = operation_tracker.updates
         context['removes'] = operation_tracker.removes
-        return render_template('mongo-panel.html', **context)
-
-
+        return self.render('mongo-panel.html', context)
