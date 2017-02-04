@@ -1,5 +1,3 @@
-{% load mongo_debug_tags %}
-
 <style type="text/css">
 pre.mongo-highlight, pre.mongo-highlight span {
     font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', 'Monaco', 'Courier New', monospace !important;
@@ -36,23 +34,23 @@ table.mongo-op-table tbody {
     </thead>
     <tbody>
         {% for query in queries %}
-            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
-                <td>{{ query.time|floatformat:"4" }}</td>
+            <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }}">
+                <td>{{ query.time }}</td>
                 <td>{{ query.operation|title }}</td>
                 <td>{{ query.collection }}</td>
                 <td>
                     {% if query.query %}
-                    <pre class="mongo-highlight">{{ query.query|format_dict|highlight:"javascript"|safe }}</pre>
+                    <pre class="mongo-highlight">{{ query.query|safe }}</pre>
                   {% endif %}
                 </td>
                 <td><pre class="mongo-highlight">{% if query.ordering %}{{ query.ordering }}{% endif %}</pre></td>
                 <td>{% if query.skip %}{{ query.skip }}{% endif %}</td>
                 <td>{% if query.limit %}{{ query.limit }}{% endif %}</td>
-                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="queries-{{ forloop.counter }}">Toggle</a></td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="queries-{{ loop.counter }}">Toggle</a></td>
             </tr>
-            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+            <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }}">
                 <td colspan="8">
-                    <table class="mongo-stack-trace "id="mongo-stack-trace-queries-{{ forloop.counter }}">
+                    <table class="mongo-stack-trace "id="mongo-stack-trace-queries-{{ loop.counter }}">
                         <thead>
                             <tr>
                                 <th>Line</th>
@@ -65,9 +63,9 @@ table.mongo-op-table tbody {
                         {% for line in query.stack_trace %}
                             <tr>
                                 <td class="lineno">{{ line.1 }}</td>
-                                <td class="file">{{ line.0|embolden_file }}</td>
+                                <td class="file">{{ line.0 }}</td>
                                 <td class="function">{{ line.2 }}</td>
-                                <td class="code">{{ line.3|highlight:"python"|safe }}</td>
+                                <td class="code">{{ line.3|safe }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -94,17 +92,17 @@ table.mongo-op-table tbody {
     </thead>
     <tbody>
         {% for insert in inserts %}
-            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
-                <td>{{ insert.time|floatformat:"4" }}</td>
+            <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }}">
+                <td>{{ insert.time }}</td>
                 <td>
-                    <pre class="mongo-highlight">{{ insert.document|format_dict:120|highlight:"javascript"|safe }}</pre>
+                    <pre class="mongo-highlight">{{ insert.document|safe }}</pre>
                 </td>
                 <td>{{ insert.safe }}</td>
-                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="inserts-{{ forloop.counter }}">Toggle</a></td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="inserts-{{ loop.counter }}">Toggle</a></td>
             </tr>
-            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+            <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }}">
                 <td colspan="4">
-                    <table class="mongo-stack-trace "id="mongo-stack-trace-inserts-{{ forloop.counter }}">
+                    <table class="mongo-stack-trace "id="mongo-stack-trace-inserts-{{ loop.counter }}">
                         <thead>
                             <tr>
                                 <th>Line</th>
@@ -117,9 +115,9 @@ table.mongo-op-table tbody {
                         {% for line in insert.stack_trace %}
                             <tr>
                                 <td class="lineno">{{ line.1 }}</td>
-                                <td class="file">{{ line.0|embolden_file }}</td>
+                                <td class="file">{{ line.0 }}</td>
                                 <td class="function">{{ line.2 }}</td>
-                                <td class="code">{{ line.3|highlight:"python"|safe }}</td>
+                                <td class="code">{{ line.3|safe }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -146,17 +144,17 @@ table.mongo-op-table tbody {
     </thead>
     <tbody>
         {% for remove in removes %}
-            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
-                <td>{{ remove.time|floatformat:"4" }}</td>
+            <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }}">
+                <td>{{ remove.time }}</td>
                 <td>
-                    <pre class="mongo-highlight">{{ remove.spec_or_id|format_dict:120|highlight:"javascript"|safe }}</pre>
+                    <pre class="mongo-highlight">{{ remove.spec_or_id|safe }}</pre>
                 </td>
                 <td>{{ remove.safe }}</td>
-                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="removes-{{ forloop.counter }}">Toggle</a></td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="removes-{{ loop.counter }}">Toggle</a></td>
             </tr>
-            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+            <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }}">
                 <td colspan="4">
-                    <table class="mongo-stack-trace "id="mongo-stack-trace-removes-{{ forloop.counter }}">
+                    <table class="mongo-stack-trace "id="mongo-stack-trace-removes-{{ loop.counter }}">
                         <thead>
                             <tr>
                                 <th>Line</th>
@@ -169,9 +167,9 @@ table.mongo-op-table tbody {
                         {% for line in remove.stack_trace %}
                             <tr>
                                 <td class="lineno">{{ line.1 }}</td>
-                                <td class="file">{{ line.0|embolden_file }}</td>
+                                <td class="file">{{ line.0 }}</td>
                                 <td class="function">{{ line.2 }}</td>
-                                <td class="code">{{ line.3|highlight:"python"|safe }}</td>
+                                <td class="code">{{ line.3|safe }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -201,22 +199,22 @@ table.mongo-op-table tbody {
     </thead>
     <tbody>
         {% for update in updates %}
-            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
-                <td>{{ update.time|floatformat:"4" }}</td>
+            <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }}">
+                <td>{{ update.time }}</td>
                 <td>
-                    <pre class="mongo-highlight">{{ update.spec|format_dict:120|highlight:"javascript"|safe }}</pre>
+                    <pre class="mongo-highlight">{{ update.spec|safe }}</pre>
                 </td>
                 <td>
-                    <pre class="mongo-highlight">{{ update.document|format_dict:120|highlight:"javascript"|safe }}</pre>
+                    <pre class="mongo-highlight">{{ update.document|safe }}</pre>
                 </td>
                 <td>{{ update.safe }}</td>
                 <td>{{ update.multi }}</td>
                 <td>{{ update.upsert }}</td>
-                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="updates-{{ forloop.counter }}">Toggle</a></td>
+                <td><a href="javascript:void(0);" class="mongo-toggle-trace" data-row="updates-{{ loop.counter }}">Toggle</a></td>
             </tr>
-            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}">
+            <tr class="{{ loop.cycle('flDebugOdd', 'flDebugEven') }}">
                 <td colspan="7">
-                    <table class="mongo-stack-trace "id="mongo-stack-trace-updates-{{ forloop.counter }}">
+                    <table class="mongo-stack-trace "id="mongo-stack-trace-updates-{{ loop.counter }}">
                         <thead>
                             <tr>
                                 <th>Line</th>
@@ -229,9 +227,9 @@ table.mongo-op-table tbody {
                         {% for line in update.stack_trace %}
                             <tr>
                                 <td class="lineno">{{ line.1 }}</td>
-                                <td class="file">{{ line.0|embolden_file }}</td>
+                                <td class="file">{{ line.0 }}</td>
                                 <td class="function">{{ line.2 }}</td>
-                                <td class="code">{{ line.3|highlight:"python"|safe }}</td>
+                                <td class="code">{{ line.3|safe }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>

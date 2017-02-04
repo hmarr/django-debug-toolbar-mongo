@@ -2,7 +2,6 @@ import functools
 import time
 import inspect
 import os
-import SocketServer
 
 import pymongo
 import pymongo.collection
@@ -223,7 +222,6 @@ def _tidy_stacktrace(stack):
 
     ``stack`` should be a list of frame tuples from ``inspect.stack()``
     """
-    socketserver_path = os.path.realpath(os.path.dirname(SocketServer.__file__))
     pymongo_path = os.path.realpath(os.path.dirname(pymongo.__file__))
 
     trace = []
@@ -232,8 +230,6 @@ def _tidy_stacktrace(stack):
         # Support hiding of frames -- used in various utilities that provide
         # inspection.
         if '__traceback_hide__' in frame.f_locals:
-            continue
-        if socketserver_path in s_path:
             continue
         if pymongo_path in s_path:
             continue
