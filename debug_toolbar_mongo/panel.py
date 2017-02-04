@@ -1,8 +1,7 @@
-from django.template.loader import render_to_string
-
+from flask import render_template
 from flask_debugtoolbar.panels import DebugPanel
 
-import operation_tracker
+from . import operation_tracker
 
 
 class MongoDebugPanel(DebugPanel):
@@ -40,6 +39,6 @@ class MongoDebugPanel(DebugPanel):
         context['inserts'] = operation_tracker.inserts
         context['updates'] = operation_tracker.updates
         context['removes'] = operation_tracker.removes
-        return render_to_string('mongo-panel.html', context)
+        return render_template('mongo-panel.html', **context)
 
 
