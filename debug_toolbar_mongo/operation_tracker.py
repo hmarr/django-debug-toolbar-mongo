@@ -2,8 +2,11 @@ import functools
 import time
 import inspect
 import os
-import SocketServer
-
+try:
+    import SocketServer
+except:
+    import socketserver
+           
 import django
 from django.conf import settings
 
