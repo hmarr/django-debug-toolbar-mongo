@@ -2,3 +2,7 @@
 .tox
 *.egg-info
 *.egg
+.idea/
+
+
+venv_debug/
