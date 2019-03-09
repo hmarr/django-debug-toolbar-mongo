@@ -2,7 +2,7 @@ import functools
 import time
 import inspect
 import os
-import SocketServer
+import socketserver
 
 import django
 from django.conf import settings
@@ -13,7 +13,6 @@ import pymongo.cursor
 
 __all__ = ['queries', 'inserts', 'updates', 'removes', 'install_tracker',
            'uninstall_tracker', 'reset']
-
 
 _original_methods = {
     'insert': pymongo.collection.Collection.insert,
@@ -28,6 +27,8 @@ updates = []
 removes = []
 
 WANT_STACK_TRACE = getattr(settings, 'DEBUG_TOOLBAR_MONGO_STACKTRACES', True)
+
+
 def _get_stacktrace():
     if WANT_STACK_TRACE:
         try:
@@ -51,7 +52,7 @@ def _get_stacktrace():
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['insert'])
 def _insert(collection_self, doc_or_docs, manipulate=True,
-           safe=False, check_keys=True, **kwargs):
+            safe=False, check_keys=True, **kwargs):
     start_time = time.time()
     result = _original_methods['insert'](
         collection_self,
@@ -72,10 +73,11 @@ def _insert(collection_self, doc_or_docs, manipulate=True,
     })
     return result
 
+
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['update'])
 def _update(collection_self, spec, document, upsert=False,
-           maniuplate=False, safe=False, multi=False, **kwargs):
+            maniuplate=False, safe=False, multi=False, **kwargs):
     start_time = time.time()
     result = _original_methods['update'](
         collection_self,
@@ -100,6 +102,7 @@ def _update(collection_self, spec, document, upsert=False,
     })
     return result
 
+
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['remove'])
 def _remove(collection_self, spec_or_id, safe=False, **kwargs):
@@ -120,6 +123,7 @@ def _remove(collection_self, spec_or_id, safe=False, **kwargs):
         'stack_trace': _get_stacktrace(),
     })
     return result
+
 
 # Wrap Cursor._refresh for getting queries
 @functools.wraps(_original_methods['refresh'])
@@ -188,6 +192,7 @@ def _cursor_refresh(cursor_self):
 
     return result
 
+
 def install_tracker():
     if pymongo.collection.Collection.insert != _insert:
         pymongo.collection.Collection.insert = _insert
@@ -197,6 +202,7 @@ def install_tracker():
         pymongo.collection.Collection.remove = _remove
     if pymongo.cursor.Cursor._refresh != _cursor_refresh:
         pymongo.cursor.Cursor._refresh = _cursor_refresh
+
 
 def uninstall_tracker():
     if pymongo.collection.Collection.insert == _insert:
@@ -208,6 +214,7 @@ def uninstall_tracker():
     if pymongo.cursor.Cursor._refresh == _cursor_refresh:
         pymongo.cursor.Cursor._refresh = _original_methods['cursor_refresh']
 
+
 def reset():
     global queries, inserts, updates, removes
     queries = []
@@ -215,28 +222,31 @@ def reset():
     updates = []
     removes = []
 
+
 def _get_ordering(son):
     """Helper function to extract formatted ordering from dict.
     """
+
     def fmt(field, direction):
         return '{0}{1}'.format({-1: '-', 1: '+'}[direction], field)
 
     if '$orderby' in son:
         return ', '.join(fmt(f, d) for f, d in son['$orderby'].items())
 
+
 # Taken from Django Debug Toolbar 0.8.6
 def _tidy_stacktrace(stack):
     """
     Clean up stacktrace and remove all entries that:
     1. Are part of Django (except contrib apps)
-    2. Are part of SocketServer (used by Django's dev server)
+    2. Are part of socketserver (used by Django's dev server)
     3. Are the last entry (which is part of our stacktracing code)
 
     ``stack`` should be a list of frame tuples from ``inspect.stack()``
     """
     django_path = os.path.realpath(os.path.dirname(django.__file__))
     django_path = os.path.normpath(os.path.join(django_path, '..'))
-    socketserver_path = os.path.realpath(os.path.dirname(SocketServer.__file__))
+    socketserver_path = os.path.realpath(os.path.dirname(socketserver.__file__))
     pymongo_path = os.path.realpath(os.path.dirname(pymongo.__file__))
 
     trace = []
@@ -247,7 +257,7 @@ def _tidy_stacktrace(stack):
         if '__traceback_hide__' in frame.f_locals:
             continue
         if getattr(settings, 'DEBUG_TOOLBAR_CONFIG', {}).get('HIDE_DJANGO_SQL', True) \
-            and django_path in s_path and not 'django/contrib' in s_path:
+                and django_path in s_path and not 'django/contrib' in s_path:
             continue
         if socketserver_path in s_path:
             continue
@@ -259,4 +269,3 @@ def _tidy_stacktrace(stack):
             text = (''.join(text)).strip()
         trace.append((path, line_no, func_name, text))
     return trace
-

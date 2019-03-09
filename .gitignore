@@ -4,5 +4,4 @@
 *.egg
 .idea/
 
-
 venv_debug/

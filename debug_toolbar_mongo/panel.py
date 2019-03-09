@@ -1,5 +1,4 @@
 from django.template import Template, Context
-from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from debug_toolbar.panels import Panel
@@ -15,6 +14,7 @@ _NAV_SUBTITLE_TPL = u'''
     {% endif %}
 {% endfor %}
 '''
+
 
 class MongoDebugPanel(Panel):
     """Panel that shows information about MongoDB operations.
