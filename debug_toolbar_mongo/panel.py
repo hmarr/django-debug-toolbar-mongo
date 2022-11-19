@@ -1,8 +1,7 @@
 from django.template import Template, Context
-from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-from debug_toolbar.panels import DebugPanel
+from debug_toolbar.panels import Panel
 
 import operation_tracker
 
@@ -16,7 +15,8 @@ _NAV_SUBTITLE_TPL = u'''
 {% endfor %}
 '''
 
-class MongoDebugPanel(DebugPanel):
+
+class MongoDebugPanel(Panel):
     """Panel that shows information about MongoDB operations.
     """
     name = 'MongoDB'
@@ -67,10 +67,11 @@ class MongoDebugPanel(DebugPanel):
     def url(self):
         return ''
 
-    def process_response(self, request, response):
-        self.record_stats({
+    def get_stats(self):
+
+        return {
             'queries': operation_tracker.queries,
             'inserts': operation_tracker.inserts,
             'updates': operation_tracker.updates,
             'removes': operation_tracker.removes
-        })
+        }
